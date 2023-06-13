@@ -10,6 +10,7 @@ actionUpperLimits = [100 1]';
 
 stateLowerLimits = [0 0]';
 stateUpperLimits = [5500 130]';
+save('system_param_settings', 'actionLowerLimits', 'actionUpperLimits', 'stateLowerLimits', 'stateUpperLimits')
 
 %% Define state (observation) and action space
 obsInfo = rlNumericSpec([2 1],...

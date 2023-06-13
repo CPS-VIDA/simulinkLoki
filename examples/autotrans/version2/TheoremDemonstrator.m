@@ -1,11 +1,15 @@
 % Load the agent
-
 load("LOKI_autotrans.mat","agentObj")
 
+% Load the system settings
+load('system_param_settings.mat')
 
-% predictImNN = predict(agentObj,[100;100]);
-action = getAction(agentObj,[100;100]);
+
+% State sampling
+state_sample = unifrnd(stateLowerLimits,stateUpperLimits)
 
 
+% Network Actions
+action = getAction(agentObj,state_sample);
 critic = getCritic(agentObj);
-state_value = getValue(critic,{[100;100]}, action)
+state_value = getValue(critic,{state_sample}, action)
