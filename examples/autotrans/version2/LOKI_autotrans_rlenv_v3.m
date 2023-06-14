@@ -101,20 +101,20 @@ agentObj.SampleTime = Ts;
 
 agentObj.AgentOptions.TargetSmoothFactor = 1e-3;
 agentObj.AgentOptions.DiscountFactor = 1.0;
-agentObj.AgentOptions.MiniBatchSize = 2;
+agentObj.AgentOptions.MiniBatchSize = 5;
 agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
 
 agentObj.AgentOptions.NoiseOptions.Variance = 0.3;
 agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-5;
 
-agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-03;
+agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-02;
 agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 1;
-agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-04;
+agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-02;
 agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 %% Do the training  
 trainOpts = rlTrainingOptions(...
-    MaxEpisodes=8000, ...
+    MaxEpisodes=1000, ...
     MaxStepsPerEpisode=ceil(Tf/Ts), ...
     ScoreAveragingWindowLength=20, ...
     Verbose=false, ...
@@ -128,6 +128,7 @@ if doTraining
     % Train the agent.
     trainingStats = train(agentObj,env,trainOpts);
     save('LOKI_autotrans','agentObj');
+    save('trainingStats', "trainingStats") % save the training results. 
 else
     % Load the pretrained agent for the example.
     load("LOKI_autotrans.mat","agentObj")
