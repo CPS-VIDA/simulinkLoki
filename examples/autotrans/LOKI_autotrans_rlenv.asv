@@ -2,15 +2,14 @@ clc;
 clear;
 rng(100);
 vmax = 120;
-Tf = 20;
+Tf = 30;
 Ts = 1.0;
 tau = 20;
 actionLowerLimits = [0 0]';
-actionUpperLimits = [100 325]';
+actionUpperLimits = [100 1]';
 
 stateLowerLimits = [0 0]';
 stateUpperLimits = [5500 130]';
-save('system_param_settings', 'actionLowerLimits', 'actionUpperLimits', 'stateLowerLimits', 'stateUpperLimits')
 
 %% Define state (observation) and action space
 obsInfo = rlNumericSpec([2 1],...
@@ -24,7 +23,7 @@ actInfo=rlNumericSpec([2 1],...
     UpperLimit=actionUpperLimits); % brake upper limit should be 325
 actInfo.Name="throttle, brake";
 
-env=rlSimulinkEnv("LOKI_autotrans2","LOKI_autotrans2/RL Agent",...
+env=rlSimulinkEnv("LOKI_autotrans","LOKI_autotrans/RL Agent",...
     obsInfo,actInfo);
 %% Make critic network
 deno = 1./(obsInfo.UpperLimit-obsInfo.LowerLimit);
@@ -96,7 +95,6 @@ a = [getAction(actor,{rand(obsInfo.Dimension)})];
 fprintf('%s',mat2str(a{1},3));
 %% Setup the RL agent
 agentObj = rlDDPGAgent(actor,critic);
-
 agentObj.SampleTime = Ts;
 
 agentObj.AgentOptions.TargetSmoothFactor = 1e-3;
@@ -114,7 +112,7 @@ agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 %% Do the training  
 trainOpts = rlTrainingOptions(...
-    MaxEpisodes=8000, ...
+    MaxEpisodes=100, ...
     MaxStepsPerEpisode=ceil(Tf/Ts), ...
     ScoreAveragingWindowLength=20, ...
     Verbose=false, ...
