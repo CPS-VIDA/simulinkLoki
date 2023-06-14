@@ -2,7 +2,7 @@ clc;
 clear;
 rng(100);
 vmax = 120;
-Tf = 30;
+Tf = 20;
 Ts = 1.0;
 tau = 20;
 actionLowerLimits = [0 0]';
