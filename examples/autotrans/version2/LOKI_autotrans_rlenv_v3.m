@@ -47,7 +47,7 @@ invActionBias = -actionDeno.*(actInfo.UpperLimit + actInfo.LowerLimit);
 % 'Max',transpose(actInfo.UpperLimit),...
 statePath = [
     featureInputLayer(obsInfo.Dimension(1),Name="netObsIn")   
-    fullyConnectedLayer(2)
+    fullyConnectedLayer(5)
     reluLayer
     fullyConnectedLayer(2,Name="CriticStateFC2")];
 
@@ -86,7 +86,7 @@ actionScaling = 0.5 *(actInfo.UpperLimit-actInfo.LowerLimit);
 actionBias= 0.5*(actInfo.UpperLimit+actInfo.LowerLimit);
 actorNetwork = [
     featureInputLayer(obsInfo.Dimension(1))
-    fullyConnectedLayer(2)
+    fullyConnectedLayer(5)
     tanhLayer
     fullyConnectedLayer(actInfo.Dimension(1))
     tanhLayer
@@ -102,15 +102,15 @@ agentObj.SampleTime = Ts;
 
 agentObj.AgentOptions.TargetSmoothFactor = 1e-3;
 agentObj.AgentOptions.DiscountFactor = 1.0;
-agentObj.AgentOptions.MiniBatchSize = 500;
+agentObj.AgentOptions.MiniBatchSize = 1000;
 agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
 
-agentObj.AgentOptions.NoiseOptions.Variance = 0.1;
+agentObj.AgentOptions.NoiseOptions.Variance = 0.5;
 agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-5;
 
-agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-02;
+agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-01;
 agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 1;
-agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-02;
+agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-01;
 agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 %% Do the training  
