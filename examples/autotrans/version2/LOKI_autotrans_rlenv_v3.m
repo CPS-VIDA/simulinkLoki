@@ -1,10 +1,11 @@
 clc;
 clear;
-rng(100);
+rng(10);  %was 100
 vmax = 120;
 Tf = 20;
 Ts = 1.0;
 tau = 20;
+initrpm = 1000;
 actionLowerLimits = [0 0]';
 actionUpperLimits = [100 325]';
 
@@ -88,6 +89,7 @@ actorNetwork = [
     fullyConnectedLayer(2)
     tanhLayer
     fullyConnectedLayer(actInfo.Dimension(1))
+    tanhLayer
     ];
 actorNetwork = dlnetwork(actorNetwork);
 summary(actorNetwork);
@@ -96,15 +98,14 @@ a = [getAction(actor,{rand(obsInfo.Dimension)})];
 fprintf('%s',mat2str(a{1},3));
 %% Setup the RL agent
 agentObj = rlDDPGAgent(actor,critic);
-
 agentObj.SampleTime = Ts;
 
 agentObj.AgentOptions.TargetSmoothFactor = 1e-3;
 agentObj.AgentOptions.DiscountFactor = 1.0;
-agentObj.AgentOptions.MiniBatchSize = 5;
+agentObj.AgentOptions.MiniBatchSize = 500;
 agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
 
-agentObj.AgentOptions.NoiseOptions.Variance = 0.3;
+agentObj.AgentOptions.NoiseOptions.Variance = 0.02;
 agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-5;
 
 agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-02;
@@ -114,7 +115,7 @@ agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 %% Do the training  
 trainOpts = rlTrainingOptions(...
-    MaxEpisodes=1000, ...
+    MaxEpisodes=10000, ...
     MaxStepsPerEpisode=ceil(Tf/Ts), ...
     ScoreAveragingWindowLength=20, ...
     Verbose=false, ...
