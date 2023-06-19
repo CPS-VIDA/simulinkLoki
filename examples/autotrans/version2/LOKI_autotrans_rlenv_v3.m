@@ -127,7 +127,6 @@ trainOpts = rlTrainingOptions(...
 doTraining = true;
 if doTraining
     % Train the agent.
-    load("LOKI_autotrans_has_falsify.mat","agentObj")  % load the training agent
     trainingStats = train(agentObj,env,trainOpts);
     save('LOKI_autotrans','agentObj');
     save('trainingStats', "trainingStats") % save the training results. 

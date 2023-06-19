@@ -55,9 +55,9 @@ agentObj.AgentOptions.ExperienceBufferLength = 1e6;
 agentObj.AgentOptions.NoiseOptions.Variance = 0.3;
 agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-5;
 
-agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-04;
+agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e02;
 agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 1;
-agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-04;
+agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e2;
 agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 
