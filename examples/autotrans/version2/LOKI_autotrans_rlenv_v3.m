@@ -101,8 +101,8 @@ agentObj = rlDDPGAgent(actor,critic);
 agentObj.SampleTime = Ts;
 
 agentObj.AgentOptions.TargetSmoothFactor = 1e-3;
-agentObj.AgentOptions.DiscountFactor = 1.0;
-agentObj.AgentOptions.MiniBatchSize = 2;
+agentObj.AgentOptions.DiscountFactor = 0.9;
+agentObj.AgentOptions.MiniBatchSize = 1000;
 agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
 
 agentObj.AgentOptions.NoiseOptions.Variance = 0.5;
