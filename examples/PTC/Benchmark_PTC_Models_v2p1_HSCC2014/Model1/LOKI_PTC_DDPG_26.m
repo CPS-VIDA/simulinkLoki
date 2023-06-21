@@ -1,7 +1,7 @@
 clc;
 clear;
 rng(100);
-Tf = 50;
+Tf = 40;
 SampleTime = 5;
 fuel_inj_tol = 1.0; 
 MAF_sensor_tol = 1.0;
@@ -17,8 +17,8 @@ Ts = 11.0; % Ti + eta_S->N
 actionLowerLimits = [0 900]';
 actionUpperLimits = [61.1 1100]';
 
-stateLowerLimits = [9 12]';
-stateUpperLimits = [20 15]';
+stateLowerLimits = [10 12]';
+stateUpperLimits = [19 15]';
 
 criticHiddenLayerSize = 5;
 actorHiddenLayerSize = 3;
@@ -33,19 +33,21 @@ obsInfo.Description="rpm, speed";
 actInfo=rlNumericSpec([2 1],...
     LowerLimit=[-1 -1]',...
     UpperLimit=[1 1]'); %
-actInfo.Name="throttle, brake";
+actInfo.Name="throttle;en_speed";
 
 env=rlSimulinkEnv("AbstractFuelControl_M1_LOKI","AbstractFuelControl_M1_LOKI/RL Agent",...
     obsInfo,actInfo);
+
+
 %% Make critic network
 statePath = [
     featureInputLayer(obsInfo.Dimension(1),Name="netObsIn")   
-    fullyConnectedLayer(2*criticHiddenLayerSize)
+    fullyConnectedLayer(criticHiddenLayerSize)
     reluLayer
     fullyConnectedLayer(criticHiddenLayerSize,Name="CriticStateFC2")];
 
 actionPath = [
-    featureInputLayer(actInfo.Dimension(1),Name="netActIn")   
+    featureInputLayer(actInfo.Dimension(1),Name="netActIn")
     fullyConnectedLayer(criticHiddenLayerSize,Name="CriticActionFC1")];
 
 commonPath = [
@@ -80,44 +82,55 @@ critic = rlQValueFunction(criticNetwork,obsInfo,actInfo, ...
 actorNetwork = [
     featureInputLayer(obsInfo.Dimension(1))
     fullyConnectedLayer(actorHiddenLayerSize)
-    tanhLayer
+    reluLayer
     fullyConnectedLayer(actInfo.Dimension(1))
+    tanhLayer
     ];
 actorNetwork = dlnetwork(actorNetwork);
 %summary(actorNetwork);
 actor = rlContinuousDeterministicActor(actorNetwork,obsInfo,actInfo);
 % a = [getAction(actor,{rand(obsInfo.Dimension)})];
 % fprintf('%s.\n',mat2str(a{1},3));
-%% Setup the RL agent
-agentObj = rlDDPGAgent(actor,critic);
-agentObj.SampleTime = SampleTime;
 
-agentObj.AgentOptions.TargetSmoothFactor = 1e-3;
-agentObj.AgentOptions.DiscountFactor = 1.0;
-agentObj.AgentOptions.MiniBatchSize = 50;
-agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
-
-agentObj.AgentOptions.NoiseOptions.Variance = 0.4;
-agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-4;
-
-agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-04;
-agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 10;
-agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-03;
-agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 10;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 
 %% Do the training  
 % Plots="training-progress",...
+
+
+    % UseParallel=true,...
+
+    %% Setup the RL agent
+criticOptions = rlOptimizerOptions( ...
+    LearnRate=1e-3, ...
+    GradientThreshold=10, ...
+    L2RegularizationFactor=1e-4);
+actorOptions = rlOptimizerOptions( ...
+    LearnRate=1e-4, ...
+    GradientThreshold=10, ...
+    L2RegularizationFactor=1e-4);
+
+agentOptions = rlDDPGAgentOptions(...
+    TargetSmoothFactor = 1e-3, ...
+    SampleTime = SampleTime, ...
+    MiniBatchSize = 20, ...
+    DiscountFactor = 1.0,  ...
+    ExperienceBufferLength = 1e7, ...
+    ActorOptimizerOptions = actorOptions, ...
+    CriticOptimizerOptions = criticOptions);
+
+agentOptions.NoiseOptions.Variance = [1.0;1.0];
+agentOptions.NoiseOptions.VarianceDecayRate = 1e-4;
+agentObj = rlDDPGAgent(actor,critic,agentOptions);
+%%
 trainOpts = rlTrainingOptions(...
-    MaxEpisodes=10, ...
+    MaxEpisodes=2000, ...
     MaxStepsPerEpisode=ceil(Tf/SampleTime), ...
     ScoreAveragingWindowLength=50, ...
-    Verbose=1, ...
+    Verbose=1, ...   
     Plots='training-progress',...
     StopTrainingCriteria="AverageReward",...    
     StopTrainingValue=0.03);
-    % UseParallel=true,...
-%%
 startTime = tic;
 % Train the agent.
 trainingStats = train(agentObj,env,trainOpts);
@@ -127,7 +140,7 @@ fprintf('Finished Training. Total Time Taken = %d.\n',trainingTime);
 %
 % es = agentObj.ExperienceBuffer.allExperiences;
 % actions = [es.Action];
-save('./results/LOKI_PTC_DDPG_26','agentObj','trainingStats','trainingTime');
+save('./results/LOKI_PTC_DDPG_Prop26_Tf50_1000','agentObj','trainingStats','trainingTime');
 % agentObj.generatePolicyFunction('FunctionName','autotrans_DDPG_AT1_evaluate_policy','MATFileName','./results/autotrans_DDPG_AT1');
 
 
