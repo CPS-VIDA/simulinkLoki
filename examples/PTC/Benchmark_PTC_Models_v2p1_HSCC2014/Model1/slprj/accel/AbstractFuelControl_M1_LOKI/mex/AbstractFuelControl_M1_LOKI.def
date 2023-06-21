@@ -1,0 +1,4 @@
+LIBRARY ..\..\..\..\AbstractFuelControl_M1_LOKI_acc.mexw64
+EXPORTS
+    mexFunction
+    mexfilerequiredapiversion
