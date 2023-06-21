@@ -1,5 +1,5 @@
 %% Load the agent
-load("LOKI_autotrans_trained.mat","agentObj")
+load("LOKI_autotrans_trained_v1.mat","agentObj")
 
 % Load the system settings
 load('system_param_settings.mat')
@@ -7,14 +7,14 @@ vmax = 120;
 Tf = 20;
 Ts = 1.0;
 tau = 20;
-initrpm=3000;   % Init states for RPM, 1000 is the training value. 600 is the lower bound. 
+initrpm=1000;   % Init states for RPM, 1000 is the training value. 600 is the lower bound. 
 
 % State sampling
 % state_sample = unifrnd(stateLowerLimits,stateUpperLimits)
 
 % Training init state (the origin one)
-state_sample = [1000; 0];   % speed always starts from 0 in this case study.
-state_sample_new = [100; 0];
+state_sample = [1000; 10];   % speed always starts from 0 in this case study.
+state_sample_new = [600; 0];
 
 % Network Actions
 critic = getCritic(agentObj);
@@ -49,7 +49,6 @@ simOpts = rlSimulationOptions(...
     MaxSteps=30,...
     NumSimulations=1);
 
-load("LOKI_autotrans_trained.mat","agentObj")
 experience = sim(env,agentObj,simOpts);
 
 
