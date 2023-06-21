@@ -1,8 +1,8 @@
 
 %% Load the agent
-% rng(10);  %was 100
+rng(100);  %was 100
 
-load("LOKI_autotrans_no_noise.mat","agentObj")
+load("LOKI_autotrans.mat","agentObj")
 
 % Load the system settings
 load('system_param_settings.mat')
@@ -17,14 +17,14 @@ initrpm=1000;   % Init states for RPM, 1000 is the training value. 600 is the lo
 
 % Training init state (the origin one)
 state_sample = [1000; 0];   % speed always starts from 0 in this case study.
-state_sample_new = [1100; 0];
+state_sample_new = [600; 0];
 
 % Network Actions
 critic = getCritic(agentObj);
-action = getAction(agentObj,state_sample)
+action = getAction(agentObj,state_sample);
 state_value_origin = getValue(critic,{state_sample}, action)
 
-action2 = getAction(agentObj, state_sample_new)
+action2 = getAction(agentObj, state_sample_new);
 state_value_new = getValue(critic, {state_sample_new}, action2)
 
 %% init env
@@ -39,8 +39,7 @@ actInfo=rlNumericSpec([2 1],...
     UpperLimit=actionUpperLimits); % brake upper limit should be 325
 actInfo.Name="throttle, brake";
 
-
- env=rlSimulinkEnv("LOKI_autotrans2","LOKI_autotrans2/RL Agent",...
+env=rlSimulinkEnv("LOKI_autotrans2","LOKI_autotrans2/RL Agent",...
     obsInfo,actInfo);
 
 %% Test the theorem
@@ -55,8 +54,6 @@ experience = sim(env,agentObj);
 rho_truth = experience.Reward.Data(20)
 
 
-obs_ = experience.Observation.observations.Data;
-middle = (stateUpperLimits + stateLowerLimits);
-reverse = obs_ .* (stateUpperLimits - stateLowerLimits) ./ 2 + (middle);
-figure()
-plot(reverse(2, 1:21) - 65, '.-')
+%obs_ = experience.Observation.observations.Data
+middle = (state)
+reverse = obs_ .* (stateUpperLimits - stateLowerLimits) / 2 + (middle);

@@ -1,4 +1,4 @@
-filename = 'trainingStats_training_500.mat'
+filename = 'trainingStats_training_no_noise.mat'
 load(filename);
 
 
@@ -6,7 +6,7 @@ episodeRewards = [trainingStats.EpisodeReward];
 % x = episodeRewards(471);
 % episodeRewards(471) = x / 1000;
 averageRewards = [trainingStats.AverageReward];
-averageRewards = averageRewards(1:470);
+% averageRewards = averageRewards(1:470);
 Q0 = [trainingStats.EpisodeQ0];
 
 % Create the reward plot
