@@ -3,7 +3,7 @@ clear;
 rng(10);  %was 100
 vmax = 120;
 Tf = 20;
-Ts = 1.0;
+Ts = 1.0; % note this one is agent taking actions. 
 tau = 20;
 initrpm = 1000;
 actionLowerLimits = [0 0]';
@@ -101,7 +101,7 @@ agentObj = rlDDPGAgent(actor,critic);
 agentObj.SampleTime = Ts;
 
 agentObj.AgentOptions.TargetSmoothFactor = 1e-3;
-agentObj.AgentOptions.DiscountFactor = 1.0;
+agentObj.AgentOptions.DiscountFactor = 0.9;
 agentObj.AgentOptions.MiniBatchSize = 1000;
 agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
 
@@ -115,21 +115,21 @@ agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 %% Do the training  
 trainOpts = rlTrainingOptions(...
-    MaxEpisodes=10000, ...
+    MaxEpisodes=3, ...
     MaxStepsPerEpisode=ceil(Tf/Ts), ...
     ScoreAveragingWindowLength=20, ...
     Verbose=false, ...
     Plots="training-progress",...
-    StopTrainingCriteria="AverageReward",...
-    StopTrainingValue=800);
+    StopTrainingCriteria="EpisodeReward",...
+    StopTrainingValue=0);
 
 %%
 doTraining = true;
 if doTraining
     % Train the agent.
-    load("LOKI_autotrans_has_falsify.mat","agentObj")  % load the training agent
+    load("LOKI_autotrans_trained.mat","agentObj")
     trainingStats = train(agentObj,env,trainOpts);
-    save('LOKI_autotrans','agentObj');
+    save('LOKI_autotrans_iter2.mat','agentObj');
     save('trainingStats', "trainingStats") % save the training results. 
 else
     % Load the pretrained agent for the example.
