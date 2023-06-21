@@ -1,5 +1,5 @@
 %% Load the agent
-load("LOKI_autotrans.mat","agentObj")
+load("LOKI_autotrans_trained.mat","agentObj")
 
 % Load the system settings
 load('system_param_settings.mat')
@@ -7,7 +7,7 @@ vmax = 120;
 Tf = 20;
 Ts = 1.0;
 tau = 20;
-initrpm=1000   % Init states for RPM, 600 is the lower bound. 
+initrpm=1000;   % Init states for RPM, 600 is the lower bound. 
 
 % State sampling
 % state_sample = unifrnd(stateLowerLimits,stateUpperLimits)
@@ -37,18 +37,10 @@ actInfo.Name="throttle, brake";
 env=rlSimulinkEnv("LOKI_autotrans2","LOKI_autotrans2/RL Agent",...
     obsInfo,actInfo);
 
-%% define sim options
-simOpts = rlSimulationOptions(...
-    MaxSteps=30,...
-    NumSimulations=1)
-
-experience = sim(env,agentObj,simOpts)
-
-
 %% Get value diff
 % Sample different states and get the value diff between two iters
 % If only one ini state, then calculate one diff is enough?
-load("LOKI_autotrans_iter2.mat","agentObj2")
+agentObj2 = load("LOKI_autotrans_iter2.mat","agentObj").agentObj;
 % Network Actions
 critic2 = getCritic(agentObj2);
 action2 = getAction(agentObj2,state_sample);
@@ -60,13 +52,25 @@ gamma = 0.9;  % discount factor of the agent
 alpha =  value_diff_between_two_iter * 2 * gamma / (1 - gamma);
 
 initrpm_new = 700;
-state_sample_new = [initrpm; 0];   % speed always starts from 0 in this case study.
+state_sample_new = [initrpm_new; 0];   % speed always starts from 0 in this case study.
 
 action = getAction(agentObj,state_sample_new);
 state_value_new = getValue(critic,{state_sample}, action)
 beta = abs(state_value_new - state_value_origin)
 
+
+%% Sim for on the new init state
+initrpm = initrpm_new
+simOpts = rlSimulationOptions(...
+    MaxSteps=30,...
+    NumSimulations=1);
+
+load("LOKI_autotrans_trained.mat","agentObj")
+experience = sim(env,agentObj,simOpts);
+rho = 7.17129 / 1000;  % the old rho.
+
 rho_thoerem = rho - (2*alpha + beta)/(gamma .^ tau) 
 
-% rho_truth = 
+rho_truth = experience.Reward.Data(20)
+
 
