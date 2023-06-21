@@ -1,3 +1,5 @@
+rng(10);  %was 100
+
 %% Load the agent
 load("LOKI_autotrans_trained.mat","agentObj")
 

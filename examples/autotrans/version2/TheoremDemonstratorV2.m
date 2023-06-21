@@ -1,5 +1,8 @@
+
 %% Load the agent
-load("LOKI_autotrans_trained_v1.mat","agentObj")
+rng(10);  %was 100
+
+load("LOKI_autotrans_500.mat","agentObj")
 
 % Load the system settings
 load('system_param_settings.mat')
@@ -13,7 +16,7 @@ initrpm=1000;   % Init states for RPM, 1000 is the training value. 600 is the lo
 % state_sample = unifrnd(stateLowerLimits,stateUpperLimits)
 
 % Training init state (the origin one)
-state_sample = [1000; 10];   % speed always starts from 0 in this case study.
+state_sample = [1000; 0];   % speed always starts from 0 in this case study.
 state_sample_new = [600; 0];
 
 % Network Actions
@@ -45,11 +48,7 @@ beta = abs(state_value_new - state_value_origin)
 
 
 %% Sim for on the new init state
-simOpts = rlSimulationOptions(...
-    MaxSteps=30,...
-    NumSimulations=1);
-
-experience = sim(env,agentObj,simOpts);
+experience = sim(env,agentObj);
 
 
 rho_truth = experience.Reward.Data(20)
