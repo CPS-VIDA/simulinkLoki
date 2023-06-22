@@ -115,7 +115,7 @@ agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 %% Do the training  
 trainOpts = rlTrainingOptions(...
-    MaxEpisodes=10000, ...
+    MaxEpisodes=300000, ...
     MaxStepsPerEpisode=ceil(Tf/Ts), ...
     ScoreAveragingWindowLength=20, ...
     Verbose=false, ...
@@ -126,17 +126,17 @@ trainOpts = rlTrainingOptions(...
 %%
 doTraining = true;
 if doTraining    
-    load("LOKI_autotrans_no_noise_low_var.mat","agentObj")
-    agentObj.AgentOptions.NoiseOptions.Variance = 1;
-    agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 0;
+    load("LOKI_autotrans_no_noise_low_var_generalize.mat","agentObj")
+    agentObj.AgentOptions.NoiseOptions.Variance = 0.3;
+    agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-06;
     agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-03;
     agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 10;
     agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-03;
     agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 110;
 
     trainingStats = train(agentObj,env,trainOpts);
-    save('LOKI_autotrans_no_noise_low_var_generalize.mat','agentObj');
-    save('trainingStats_training_no_noise_low_var_generalize.mat', "trainingStats") % save the training results.
+    save('LOKI_autotrans_no_noise_low_var_generalize_continue.mat','agentObj');
+    save('trainingStats_training_no_noise_low_var_generalize_continue.mat', "trainingStats") % save the training results.
 
     % trainingStats = train(agentObj,env,trainOpts);
     % save('LOKI_autotrans.mat','agentObj');
