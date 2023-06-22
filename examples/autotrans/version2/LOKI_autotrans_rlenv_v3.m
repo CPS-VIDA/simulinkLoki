@@ -5,7 +5,7 @@ vmax = 120;
 Tf = 20;
 Ts = 1.0; % note this one is agent taking actions. 
 tau = 20;
-initrpm = 1000;
+initrpm = 1300;
 actionLowerLimits = [0 0]';
 actionUpperLimits = [100 325]';
 
@@ -105,7 +105,7 @@ agentObj.AgentOptions.DiscountFactor = 0.9;
 agentObj.AgentOptions.MiniBatchSize = 1000;
 agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
 
-agentObj.AgentOptions.NoiseOptions.Variance = 0;
+agentObj.AgentOptions.NoiseOptions.Variance = 1;
 agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 0;
 
 agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-03;
@@ -121,20 +121,27 @@ trainOpts = rlTrainingOptions(...
     Verbose=false, ...
     Plots="training-progress",...
     StopTrainingCriteria="EpisodeReward",...
-    StopTrainingValue=120000);
+    StopTrainingValue=6000);
 
 %%
 doTraining = true;
 if doTraining    
-    load("LOKI_autotrans_no_noise.mat","agentObj")
-    agentObj.AgentOptions.NoiseOptions.Variance = 0.7;
+    load("LOKI_autotrans_no_noise_low_var.mat","agentObj")
+    agentObj.AgentOptions.NoiseOptions.Variance = 1;
     agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 0;
     agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-03;
+    agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 10;
     agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-03;
+    agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 110;
 
     trainingStats = train(agentObj,env,trainOpts);
-    save('LOKI_autotrans_no_noise.mat','agentObj');
-    save('trainingStats_training_no_noise.mat', "trainingStats") % save the training results. 
+    save('LOKI_autotrans_no_noise_low_var_generalize.mat','agentObj');
+    save('trainingStats_training_no_noise_low_var_generalize.mat', "trainingStats") % save the training results.
+
+    % trainingStats = train(agentObj,env,trainOpts);
+    % save('LOKI_autotrans.mat','agentObj');
+    % save('trainingStats.mat', "trainingStats") % save the training results.
+
 else
     % Load the pretrained agent for the example.
     load("LOKI_autotrans.mat","agentObj")

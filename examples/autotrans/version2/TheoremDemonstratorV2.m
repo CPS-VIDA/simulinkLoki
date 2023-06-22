@@ -2,7 +2,7 @@
 %% Load the agent
 % rng(10);  %was 100
 
-load("LOKI_autotrans_no_noise.mat","agentObj")
+load("LOKI_autotrans_no_noise_low_var_generalize.mat","agentObj")
 
 % Load the system settings
 load('system_param_settings.mat')
@@ -10,7 +10,7 @@ vmax = 120;
 Tf = 20;
 Ts = 1;
 tau = 20;
-initrpm=1000;   % Init states for RPM, 1000 is the training value. 600 is the lower bound. 
+initrpm=6000;   % Init states for RPM, 1000 is the training value. 600 is the lower bound. 
 
 % State sampling
 % state_sample = unifrnd(stateLowerLimits,stateUpperLimits)

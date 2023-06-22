@@ -1,4 +1,4 @@
-filename = 'trainingStats_training_no_noise.mat'
+filename = 'LOKI_autotrans.mat'
 load(filename);
 
 
