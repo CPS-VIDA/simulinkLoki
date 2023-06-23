@@ -126,12 +126,12 @@ trainOpts = rlTrainingOptions(...
 %%
 doTraining = true;
 if doTraining    
-    load("LOKI_autotrans_no_noise_low_var_generalize.mat","agentObj")
-    agentObj.AgentOptions.NoiseOptions.Variance = 0.3;
-    agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-06;
-    agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-03;
-    agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 10;
-    agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-03;
+    load("LOKI_autotrans_no_noise_low_var_generalize_continue.mat","agentObj")
+    agentObj.AgentOptions.NoiseOptions.Variance = 0.1;
+    agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 0;
+    agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-04;
+    agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 110;
+    agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-04;
     agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 110;
 
     trainingStats = train(agentObj,env,trainOpts);
