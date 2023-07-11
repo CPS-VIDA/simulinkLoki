@@ -5,7 +5,7 @@ vmax = 120;
 Tf = 20;
 Ts = 1.0; % note this one is agent taking actions. 
 tau = 20;
-initrpm = 1000;
+initrpm = 1300;
 actionLowerLimits = [0 0]';
 actionUpperLimits = [100 325]';
 
@@ -105,32 +105,43 @@ agentObj.AgentOptions.DiscountFactor = 0.9;
 agentObj.AgentOptions.MiniBatchSize = 1000;
 agentObj.AgentOptions.ExperienceBufferLength = 1e6; 
 
-agentObj.AgentOptions.NoiseOptions.Variance = 0.5;
-agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 1e-5;
+agentObj.AgentOptions.NoiseOptions.Variance = 1;
+agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 0;
 
-agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-01;
+agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-03;
 agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 1;
-agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-01;
+agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-03;
 agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 1;
 % getAction(agentObj,{rand(obsInfo.Dimension)})
 %% Do the training  
 trainOpts = rlTrainingOptions(...
-    MaxEpisodes=3, ...
+    MaxEpisodes=300000, ...
     MaxStepsPerEpisode=ceil(Tf/Ts), ...
     ScoreAveragingWindowLength=20, ...
     Verbose=false, ...
     Plots="training-progress",...
     StopTrainingCriteria="EpisodeReward",...
-    StopTrainingValue=0);
+    StopTrainingValue=6000);
 
 %%
 doTraining = true;
-if doTraining
-    % Train the agent.
-    load("LOKI_autotrans_trained.mat","agentObj")
+if doTraining    
+    load("LOKI_autotrans_no_noise_low_var_generalize_continue.mat","agentObj")
+    agentObj.AgentOptions.NoiseOptions.Variance = 0.1;
+    agentObj.AgentOptions.NoiseOptions.VarianceDecayRate = 0;
+    agentObj.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-04;
+    agentObj.AgentOptions.CriticOptimizerOptions.GradientThreshold = 110;
+    agentObj.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-04;
+    agentObj.AgentOptions.ActorOptimizerOptions.GradientThreshold = 110;
+
     trainingStats = train(agentObj,env,trainOpts);
-    save('LOKI_autotrans_iter2.mat','agentObj');
-    save('trainingStats', "trainingStats") % save the training results. 
+    save('LOKI_autotrans_no_noise_low_var_generalize_continue.mat','agentObj');
+    save('trainingStats_training_no_noise_low_var_generalize_continue.mat', "trainingStats") % save the training results.
+
+    % trainingStats = train(agentObj,env,trainOpts);
+    % save('LOKI_autotrans.mat','agentObj');
+    % save('trainingStats.mat', "trainingStats") % save the training results.
+
 else
     % Load the pretrained agent for the example.
     load("LOKI_autotrans.mat","agentObj")

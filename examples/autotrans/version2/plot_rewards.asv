@@ -1,0 +1,19 @@
+filename = 'trainingStats.mat'
+load(filename);
+
+
+episodeRewards = [trainingStats.EpisodeReward];
+averageRewards = [trainingStats.]
+
+% Create the reward plot
+figure;
+plot(episodeRewards);
+hold on;
+
+% Add red line at 0
+yline(0, 'r');
+
+% Add title and labels
+title('Reward Plot');
+xlabel('Episode');
+ylabel('Total Reward');
